@@ -36,7 +36,6 @@ jobs:
         uses: docker/build-push-action@v6.18.0
         with:
           context: .
-          add-hosts: harbor.cloud.danmanners.com:172.31.0.10
           file: ./containerfile
           push: true
           network: host
