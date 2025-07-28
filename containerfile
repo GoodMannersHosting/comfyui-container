@@ -9,13 +9,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     git \
     python3.12 \
-    python3-pip \
-    apt clean && \
-    apt -y autoremove && \
-    rm -rf /var/lib/{apt,dpkg,cache,log} && \
-    rm -rf /var/cache/* && \
-    rm -rf /var/log/apt/* && \
-    rm -rf /tmp/*
+    python3-pip
 
 # Python Environment Setup
 RUN pip3 install torch torchvision torchaudio \
