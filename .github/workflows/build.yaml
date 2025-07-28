@@ -1,0 +1,42 @@
+name: Build and Push Container Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on:
+      group: default
+    env:
+      HARBOR_USER: ${{ secrets.HARBOR_USER }}
+      HARBOR_PASS: ${{ secrets.HARBOR_PASS }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.2.2
+
+      - name: Get ComfyUI Version
+        id: get_version
+        run: echo "VERSION=$(cat comfyui-version.txt)" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
+      - name: Log in to Harbor registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: harbor.cloud.danmanners.com
+          username: ${{ env.HARBOR_USER }}
+          password: ${{ env.HARBOR_PASS }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: ./containerfile
+          push: true
+          platforms: linux/amd64
+          tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:latest
+          build-args: VERSION=${{ env.VERSION }}
