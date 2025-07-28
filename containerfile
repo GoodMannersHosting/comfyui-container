@@ -1,5 +1,5 @@
 ARG VERSION="v0.3.45"
-FROM harbor.cloud.danmanners.com/library/nvidia/cuda:12.9.1-cudnn-runtime-ubuntu24.04 as build
+FROM harbor.cloud.danmanners.com/library/nvidia/cuda:12.9.1-cudnn-runtime-ubuntu24.04 AS build
 LABEL maintainer="daniel.a.manners@gmail.com"
 LABEL build_date="2025-07-20"
 ARG VERSION
