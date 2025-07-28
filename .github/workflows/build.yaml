@@ -41,5 +41,5 @@ jobs:
           push: true
           network: host
           platforms: linux/amd64
-          tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:latest
+          tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:${{ env.VERSION }}
           build-args: VERSION=${{ env.VERSION }}
