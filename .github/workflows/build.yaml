@@ -13,6 +13,7 @@ jobs:
     env:
       HARBOR_USER: ${{ secrets.HARBOR_USER }}
       HARBOR_PASS: ${{ secrets.HARBOR_PASS }}
+      HARBOR_URL: ${{ secrets.HARBOR_URL }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.2.2
