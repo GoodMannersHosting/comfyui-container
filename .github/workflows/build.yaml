@@ -40,4 +40,4 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:latest
-          build-args: VERSION=${{ env.VERSION }},REGISTRY=${{ env.HARBOR_URL }}
+          build-args: VERSION=${{ env.VERSION }}
