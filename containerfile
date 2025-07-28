@@ -19,13 +19,13 @@ RUN pip3 install torch torchvision torchaudio \
 RUN git clone \
     --branch ${VERSION} \
     --depth 1 --single-branch \
-    https://github.com/comfyanonymous/ComfyUI.git ComfyUI && \
-    cd /app/ComfyUI
+    https://github.com/comfyanonymous/ComfyUI.git ComfyUI
+
+WORKDIR /app/ComfyUI
 
 RUN pip3 install \
-    -r /app/ComfyUI/requirements.txt \
+    -r requirements.txt \
     --break-system-packages
 
 EXPOSE 8188
-# CMD ["python3", "-u", "/app/ComfyUI/main.py", "--listen", "0.0.0.0", "--port", "8188"]
-CMD ["python3", "-u", "/app/ComfyUI/main.py", "--listen", "0.0.0.0", "--front-end-version", "Comfy-Org/ComfyUI_frontend@${VERSION}"]
+CMD ["python3", "-u", "main.py", "--listen", "0.0.0.0", "--front-end-version", "Comfy-Org/ComfyUI_frontend@${VERSION}"]
