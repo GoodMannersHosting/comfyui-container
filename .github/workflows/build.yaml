@@ -38,6 +38,7 @@ jobs:
           context: .
           file: ./containerfile
           push: true
+          network: host
           platforms: linux/amd64
           tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:latest
           build-args: VERSION=${{ env.VERSION }}
