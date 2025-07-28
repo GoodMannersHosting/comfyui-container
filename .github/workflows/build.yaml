@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-push:
     runs-on:
-      group: default
+      group: nvidia
     env:
       HARBOR_USER: ${{ secrets.HARBOR_USER }}
       HARBOR_PASS: ${{ secrets.HARBOR_PASS }}
