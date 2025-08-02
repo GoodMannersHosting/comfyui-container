@@ -14,7 +14,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     git \
     python3.12 \
-    python3-pip
+    python3-pip \
+    wget \
+    curl \
+    htop
 
 # Python Environment Setup
 RUN if [ "${CUDA_NIGHTLY}" = "true" ]; then \
@@ -39,4 +42,4 @@ RUN pip3 install \
     --break-system-packages
 
 EXPOSE 8188
-CMD ["python3", "-u", "main.py", "--listen", "0.0.0.0", "--front-end-version", "Comfy-Org/ComfyUI_frontend@${VERSION}"]
+CMD ["python3", "-u", "main.py", "--listen", "0.0.0.0", "--front-end-version", "Comfy-Org/ComfyUI_frontend@latest"]
