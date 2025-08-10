@@ -14,6 +14,9 @@ jobs:
       HARBOR_USER: ${{ secrets.HARBOR_USER }}
       HARBOR_PASS: ${{ secrets.HARBOR_PASS }}
       HARBOR_URL: ${{ secrets.HARBOR_URL }}
+    permissions:
+      actions: read
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.2.2
@@ -51,3 +54,7 @@ jobs:
             BASE_TAG=12.8.1
             CUDA_VERSION=128
             CUDA_NIGHTLY=false
+
+      - uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:${{ env.VERSION }}

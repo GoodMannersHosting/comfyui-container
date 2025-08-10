@@ -39,15 +39,13 @@ RUN mkdir -p /app/ComfyUI/scripts
 
 COPY scripts/* /app/ComfyUI/scripts/
 
-RUN pip3 -m venv /app/ComfyUI/venv && \
-    /app/ComfyUI/venv/bin/pip install \
+RUN pip3 install \
     -r requirements.txt \
     --break-system-packages
 
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager /app/comfyui-manager && \
     cd /app/comfyui-manager && \
-    /app/ComfyUI/venv/bin/python -m pip \
-    install -r requirements.txt \
+    pip3 install -r requirements.txt \
     --break-system-packages
 
 EXPOSE 8188
