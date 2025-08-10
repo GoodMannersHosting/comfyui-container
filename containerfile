@@ -35,11 +35,21 @@ RUN git clone \
     --depth 1 --single-branch \
     https://github.com/comfyanonymous/ComfyUI.git ComfyUI
 
-WORKDIR /app/ComfyUI
+RUN mkdir -p /app/ComfyUI/scripts
 
-RUN pip3 install \
+COPY scripts/* /app/ComfyUI/scripts/
+
+RUN pip3 -m venv /app/ComfyUI/venv && \
+    /app/ComfyUI/venv/bin/pip install \
     -r requirements.txt \
     --break-system-packages
 
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager /app/comfyui-manager && \
+    cd /app/comfyui-manager && \
+    /app/ComfyUI/venv/bin/python -m pip \
+    install -r requirements.txt \
+    --break-system-packages
+
 EXPOSE 8188
-CMD ["python3", "-u", "main.py", "--listen", "0.0.0.0", "--front-end-version", "Comfy-Org/ComfyUI_frontend@latest"]
+WORKDIR /app/ComfyUI
+CMD ["scripts/entrypoint.sh"]
