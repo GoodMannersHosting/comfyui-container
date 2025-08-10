@@ -40,7 +40,7 @@ RUN mkdir -p /app/ComfyUI/scripts
 COPY scripts/* /app/ComfyUI/scripts/
 
 RUN pip3 install \
-    -r requirements.txt \
+    -r /app/ComfyUI/requirements.txt \
     --break-system-packages
 
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager \
