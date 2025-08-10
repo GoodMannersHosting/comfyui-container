@@ -11,13 +11,11 @@ ARG CUDA_NIGHTLY
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    git \
-    python3.12 \
-    python3-pip \
-    wget \
-    curl \
-    htop
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+    python3.12 python3-pip \
+    wget curl htop git
 
 # Python Environment Setup
 RUN if [ "${CUDA_NIGHTLY}" = "true" ]; then \
