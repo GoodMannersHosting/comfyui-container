@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Move the ComfyUI Manager to the custom_nodes directory
-mv -r /app/comfyui-manager \
+# Copy the ComfyUI Manager to the custom_nodes directory
+cp -r /app/comfyui-manager \
     /app/ComfyUI/custom_nodes/comfyui-manager || \
-    echo "ERROR: Failed to move ComfyUI Manager" && exit 1
+    echo "ERROR: Failed to copy ComfyUI Manager" && exit 1
 
 # Use the virtual environment's Python interpreter
 venv/bin/python3 \
