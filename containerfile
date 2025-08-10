@@ -43,9 +43,9 @@ RUN pip3 install \
     -r requirements.txt \
     --break-system-packages
 
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager /app/comfyui-manager && \
-    cd /app/comfyui-manager && \
-    pip3 install -r requirements.txt \
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager \
+    /app/comfyui-manager && \
+    pip3 install -r /app/comfyui-manager/requirements.txt \
     --break-system-packages
 
 EXPOSE 8188
