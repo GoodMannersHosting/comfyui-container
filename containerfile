@@ -17,15 +17,16 @@ RUN apt-get update && \
     python3.12 python3-pip \
     wget curl htop git
 
-# Python Environment Setup
+# Install uv package manager directly to /usr/local/bin
+RUN curl -LsSf https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin --strip-components=1 uv
+
+# Python Environment Setup with uv
 RUN if [ "${CUDA_NIGHTLY}" = "true" ]; then \
-    pip3 install torch torchvision torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/nightly/cu${CUDA_VERSION} \
-    --break-system-packages; \
+    uv pip install torch torchvision torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/nightly/cu${CUDA_VERSION}; \
     else \
-    pip3 install torch torchvision torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION} \
-    --break-system-packages; \
+    uv pip install torch torchvision torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}; \
     fi
 
 RUN git clone \
@@ -37,15 +38,40 @@ RUN mkdir -p /app/ComfyUI/scripts
 
 COPY scripts/* /app/ComfyUI/scripts/
 
-RUN pip3 install \
-    -r /app/ComfyUI/requirements.txt \
-    --break-system-packages
+# Create virtual environment and install ComfyUI requirements
+RUN uv venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+ENV VIRTUAL_ENV="/app/venv"
+ENV UV_PROJECT_ENVIRONMENT="/app/venv"
+
+# Install initial requirements
+RUN uv pip install -r /app/ComfyUI/requirements.txt
 
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager \
     /app/comfyui-manager && \
-    pip3 install -r /app/comfyui-manager/requirements.txt \
-    --break-system-packages
+    uv pip install -r /app/comfyui-manager/requirements.txt
+
+# Create a backup of the initial virtual environment for restoration
+RUN cp -r /app/venv /app/venv-backup
+
+# Copy pyproject.toml to the backup for version comparison
+RUN cp /app/ComfyUI/pyproject.toml /app/venv-backup/pyproject.toml
+
+# Create a persistent directory for user-installed packages
+RUN mkdir -p /app/user-packages
+ENV UV_CACHE_DIR="/app/user-packages"
+
+# Ensure uv can write to the virtual environment
+RUN chmod -R 755 /app/venv
+
+# Create a non-root user for better security
+RUN useradd -m -u 1000 -s /bin/bash comfyuser && \
+    chown -R comfyuser:comfyuser /app
+
+# Ensure virtual environment is in PATH
+ENV PATH="/app/venv/bin:$PATH"
 
 EXPOSE 8188
 WORKDIR /app/ComfyUI
+USER comfyuser
 CMD ["scripts/entrypoint.sh"]
