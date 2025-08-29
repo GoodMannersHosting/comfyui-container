@@ -18,9 +18,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4.2.2
 
-      - name: Get ComfyUI Version
-        id: get_version
-        run: echo "VERSION=$(cat comfyui-version.txt)" >> $GITHUB_ENV
+      - name: Get Versions
+        id: get_versions
+        run: |
+          echo "VERSION=$(grep '^COMFYUI_VERSION=' versions | cut -d'=' -f2)" >> $GITHUB_ENV
+          echo "UV_VERSION=$(grep '^UV_VERSION=' versions | cut -d'=' -f2)" >> $GITHUB_ENV
+          echo "BASE_TAG=$(grep '^CUDA_BASE_TAG=' versions | cut -d'=' -f2)" >> $GITHUB_ENV
+          echo "CUDA_VERSION=$(grep '^CUDA_VERSION=' versions | cut -d'=' -f2)" >> $GITHUB_ENV
+          echo "CUDA_NIGHTLY=$(grep '^CUDA_NIGHTLY=' versions | cut -d'=' -f2)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
@@ -48,6 +53,7 @@ jobs:
           tags: ${{ env.HARBOR_URL }}/library/danmanners/comfyui:${{ env.VERSION }}
           build-args: |
             VERSION=${{ env.VERSION }}
-            BASE_TAG=12.8.1
-            CUDA_VERSION=128
-            CUDA_NIGHTLY=false
+            UV_VERSION=${{ env.UV_VERSION }}
+            BASE_TAG=${{ env.BASE_TAG }}
+            CUDA_VERSION=${{ env.CUDA_VERSION }}
+            CUDA_NIGHTLY=${{ env.CUDA_NIGHTLY }}

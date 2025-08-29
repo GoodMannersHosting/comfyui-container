@@ -25,6 +25,53 @@ A production-ready Docker container for [ComfyUI](https://github.com/comfyanonym
 - **PyTorch**: CUDA-enabled PyTorch with configurable CUDA versions.
 - **Health Monitoring**: Intelligent virtual environment validation and recovery.
 
+## Build Instructions
+
+### Local Build
+
+```bash
+podman build \
+    --platform linux/amd64 \
+    --layers=true \
+    --squash \
+    -t $ContainerRegistry/$Repository/comfyui:v0.3.45 \
+    -f containerfile .
+```
+
+### Build Arguments
+
+- `VERSION`: ComfyUI git branch/tag (default: v0.3.55 from versions file)
+- `BASE_TAG`: CUDA base image tag (default: 12.8.1 from versions file)
+- `CUDA_VERSION`: CUDA version for PyTorch (default: 128 from versions file)
+- `CUDA_NIGHTLY`: Use nightly PyTorch builds (default: false from versions file)
+- `UV_VERSION`: uv package manager version (default: 0.8.14 from versions file)
+
+### Version Management
+
+Versions are centrally managed in the `versions` file with key-value pairs:
+```bash
+COMFYUI_VERSION=v0.3.55
+UV_VERSION=0.8.14
+CUDA_BASE_TAG=12.8.1
+CUDA_VERSION=128
+CUDA_NIGHTLY=false
+```
+
+You can override any version by passing build arguments:
+```bash
+podman build --build-arg UV_VERSION=0.9.0 --build-arg VERSION=v0.4.0 .
+```
+
+### Example Build with Custom Version
+
+```bash
+podman build \
+    --build-arg VERSION=v0.4.0 \
+    --build-arg CUDA_VERSION=128 \
+    -t comfyui:v0.4.0 \
+    -f containerfile .
+```
+
 ## Kubernetes Deployment
 
 This container is designed to work with the [BJW-S App-Template](https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common) Helm chart for production deployments.
@@ -132,6 +179,52 @@ Key log messages to monitor:
 2. **Version Mismatches**: Handled by automatic restoration
 3. **Missing Packages**: Detected and reported for manual intervention
 4. **Storage Issues**: Persistent volumes ensure data survival
+
+## Version Management
+
+### Versions File
+
+The `versions` file contains all component versions in key-value format:
+
+```bash
+# ComfyUI Docker Container Versions
+# Format: KEY=VALUE
+
+# ComfyUI version
+COMFYUI_VERSION=v0.3.55
+
+# uv package manager version
+UV_VERSION=0.8.14
+
+# CUDA base image tag
+CUDA_BASE_TAG=12.8.1
+
+# CUDA version for PyTorch
+CUDA_VERSION=128
+```
+
+### Updating Versions
+
+To update versions:
+
+1. **Edit the `versions` file** with new version numbers
+2. **Rebuild the container** to pick up new versions
+3. **Deploy with ArgoCD** for automatic updates
+
+### Version Override
+
+You can override any version during build:
+
+```bash
+# Override uv version
+podman build --build-arg UV_VERSION=0.9.0 .
+
+# Override multiple versions
+podman build \
+    --build-arg UV_VERSION=0.9.0 \
+    --build-arg VERSION=v0.4.0 \
+    --build-arg CUDA_VERSION=129 .
+```
 
 ## Contributing
 

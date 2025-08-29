@@ -1,12 +1,23 @@
+# Load versions from versions file
 ARG VERSION
-ARG BASE_TAG="12.8.1"
-ARG CUDA_VERSION="128"
+ARG BASE_TAG
+ARG CUDA_VERSION
 ARG CUDA_NIGHTLY="false"
-FROM harbor.cloud.danmanners.com/library/nvidia/cuda:${BASE_TAG}-cudnn-runtime-ubuntu24.04 AS build
+
+# Set default values from versions file if not provided
+ARG UV_VERSION="0.8.14"
+ARG CUDA_BASE_TAG="12.8.1"
+ARG CUDA_VERSION_DEFAULT="128"
+
+# Use provided args or defaults
+ARG FINAL_BASE_TAG=${BASE_TAG:-${CUDA_BASE_TAG}}
+ARG FINAL_CUDA_VERSION=${CUDA_VERSION:-${CUDA_VERSION_DEFAULT}}
+
+FROM harbor.cloud.danmanners.com/library/nvidia/cuda:${FINAL_BASE_TAG}-cudnn-runtime-ubuntu24.04 AS build
 LABEL maintainer="daniel.a.manners@gmail.com"
 LABEL build_date="2025-07-20"
 ARG VERSION
-ARG CUDA_VERSION
+ARG FINAL_CUDA_VERSION
 ARG CUDA_NIGHTLY
 
 WORKDIR /app
@@ -18,15 +29,17 @@ RUN apt-get update && \
     wget curl htop git
 
 # Install uv package manager directly to /usr/local/bin
-RUN curl -LsSf https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin --strip-components=1 uv
+RUN curl -LsSf https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /tmp && \
+    mv /tmp/uv-x86_64-unknown-linux-gnu/uv /usr/local/bin/uv && \
+    rm -rf /tmp/uv-x86_64-unknown-linux-gnu
 
 # Python Environment Setup with uv
 RUN if [ "${CUDA_NIGHTLY}" = "true" ]; then \
     uv pip install torch torchvision torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/nightly/cu${CUDA_VERSION}; \
+    --extra-index-url https://download.pytorch.org/whl/nightly/cu${FINAL_CUDA_VERSION}; \
     else \
     uv pip install torch torchvision torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}; \
+    --extra-index-url https://download.pytorch.org/whl/cu${FINAL_CUDA_VERSION}; \
     fi
 
 RUN git clone \
