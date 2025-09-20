@@ -92,7 +92,7 @@ RUN useradd -m -u 1001 -s /bin/bash comfyuser && chown -R comfyuser:comfyuser /a
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    python3.12 wget curl htop git sudo && \
+    python3.12 wget curl htop git sudo ffmpeg && \
     rm -rf /var/lib/apt/lists/*
 
 # Make the comfyui user capable of running sudo
