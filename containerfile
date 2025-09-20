@@ -67,15 +67,13 @@ COPY scripts/* /app/ComfyUI/scripts/
 # Install initial requirements
 RUN uv pip install -r /app/ComfyUI/requirements.txt
 
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager \
+RUN git clone https://github.com/Comfy-Org/ComfyUI-Manager \
     /app/comfyui-manager && \
     uv pip install -r /app/comfyui-manager/requirements.txt
 
-# Create a backup of the initial virtual environment for restoration
-RUN cp -r /app/venv /app/venv-backup
-
-# Copy pyproject.toml to the backup for version comparison
-RUN cp /app/ComfyUI/pyproject.toml /app/venv-backup/pyproject.toml
+# Create version tracking files
+RUN echo "${VERSION}" > /app/ComfyUI/.container_version
+RUN echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > /app/ComfyUI/.container_build_date
 
 # Create a persistent directory for user-installed packages
 RUN mkdir -p /app/user-packages
@@ -86,9 +84,10 @@ FROM harbor.cloud.danmanners.com/library/nvidia/cuda:${FINAL_BASE_TAG}-cudnn-run
 COPY --from=build /app/venv /app/venv
 COPY --from=build /app/ComfyUI /app/ComfyUI
 COPY --from=build /app/user-packages /app/user-packages
+COPY --from=build /app/comfyui-manager /app/comfyui-manager
 
 # Create a non-root user for better security
-RUN useradd -m -u 1001 -s /bin/bash comfyuser && chown comfyuser:comfyuser /app/*
+RUN useradd -m -u 1001 -s /bin/bash comfyuser && chown -R comfyuser:comfyuser /app
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
@@ -105,6 +104,9 @@ ENV UV_CACHE_DIR="/app/user-packages"
 ENV UV_PROJECT_ENVIRONMENT="/app/venv"
 
 COPY --from=build /usr/local/bin/uv /usr/local/bin/uv
+
+# Ensure proper ownership after all copies
+RUN chown -R comfyuser:comfyuser /app
 
 USER comfyuser
 

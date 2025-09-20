@@ -1,26 +1,27 @@
 #!/bin/bash
 
-# Check and potentially restore virtual environment health
-if [ -f "/app/scripts/venv-check.sh" ]; then
-    echo "Running virtual environment health check..."
-    bash /app/scripts/venv-check.sh
+# Run upgrade check and handle any necessary updates
+echo "Checking for ComfyUI upgrades..."
+if [ -f "/app/ComfyUI/scripts/upgrade-check.sh" ]; then
+    bash /app/ComfyUI/scripts/upgrade-check.sh
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Upgrade process failed"
+        exit 1
+    fi
 else
-    # Fallback to simple check if health check script not available
-    if [ ! -f "/app/venv/bin/python" ]; then
-        echo "Initializing virtual environment from backup..."
-        cp -r /app/venv-backup/* /app/venv/
-        echo "Virtual environment initialized successfully"
-    else
-        echo "Using existing virtual environment"
+    echo "Upgrade check script not found - performing basic setup..."
+    
+    # Fallback: Copy ComfyUI Manager if it doesn't exist
+    if [ ! -d "/app/ComfyUI/custom_nodes/comfyui-manager" ]; then
+        echo "Installing ComfyUI Manager..."
+        cp -r /app/comfyui-manager /app/ComfyUI/custom_nodes/comfyui-manager || \
+            echo "ERROR: Failed to copy ComfyUI Manager"
     fi
 fi
 
-# Copy the ComfyUI Manager to the custom_nodes directory
-cp -r /app/comfyui-manager \
-    /app/ComfyUI/custom_nodes/comfyui-manager || \
-    echo "ERROR: Failed to copy ComfyUI Manager"
+echo "Starting ComfyUI..."
 
 # Run the ComfyUI entrypoint script
-python3 -u main.py \
+/app/venv/bin/python -u main.py \
     --front-end-version Comfy-Org/ComfyUI_frontend@latest \
     --listen 0.0.0.0  ${CLI_ARGS}
