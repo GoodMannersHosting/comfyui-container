@@ -2,10 +2,10 @@
 # Format: KEY=VALUE
 
 # ComfyUI version
-COMFYUI_VERSION=v0.3.59
+COMFYUI_VERSION=v0.3.60
 
 # uv package manager version
-UV_VERSION=0.8.19
+UV_VERSION=0.8.22
 
 # CUDA base image tag
 CUDA_BASE_TAG=12.8.1

@@ -145,16 +145,16 @@ update_venv() {
         
         # Update core packages that might have version conflicts
         echo "Upgrading PyTorch packages..."
-        if ! /app/venv/bin/pip install --upgrade \
+        if ! uv pip install --upgrade \
             torch torchvision torchaudio \
-            --extra-index-url https://download.pytorch.org/whl/cu121 2>/dev/null; then
+            --extra-index-url https://download.pytorch.org/whl/cu128 2>/dev/null; then
             echo "WARNING: Failed to upgrade PyTorch packages - may be permission issues"
         fi
         
         # Reinstall ComfyUI requirements to ensure compatibility
         if [ -f "/app/ComfyUI/requirements.txt" ]; then
             echo "Upgrading ComfyUI requirements..."
-            if ! /app/venv/bin/pip install -r /app/ComfyUI/requirements.txt --upgrade 2>/dev/null; then
+            if ! uv pip install -r /app/ComfyUI/requirements.txt --upgrade 2>/dev/null; then
                 echo "WARNING: Failed to upgrade ComfyUI requirements - may be permission issues"
             fi
         fi
@@ -162,7 +162,7 @@ update_venv() {
         # Reinstall ComfyUI Manager requirements
         if [ -f "/app/comfyui-manager/requirements.txt" ]; then
             echo "Upgrading ComfyUI Manager requirements..."
-            if ! /app/venv/bin/pip install -r /app/comfyui-manager/requirements.txt --upgrade 2>/dev/null; then
+            if ! uv pip install -r /app/comfyui-manager/requirements.txt --upgrade 2>/dev/null; then
                 echo "WARNING: Failed to upgrade ComfyUI Manager requirements - may be permission issues"
             fi
         fi
